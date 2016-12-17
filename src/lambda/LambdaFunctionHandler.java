@@ -30,10 +30,10 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 			final StringBuilder sb = new StringBuilder();
 	        while (true) {
 	            line = reader.readLine();
-	            sb.append(line).append("\r\n");
 	            if (line == null){
 	            	break;
 	            }
+	            sb.append(line).append("\r\n");
 	        }
 			return sb.toString();
 		} catch(Exception e){
