@@ -16,6 +16,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lambda.file.Record;
 import lambda.file.Records;
 
 public class LambdaFunctionHandler implements RequestHandler<Object, String> {
@@ -56,7 +57,17 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		if(loaderJson == null || loaderJson.equals("")){
 			return sb.toString();
 		}
-		final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
+		final ObjectMapper mapper = new ObjectMapper();
+		final Records records = mapper.readValue(loaderJson, Records.class);
+		boolean first = true;
+		for(final Record record : records.getData()){
+			if(!first){
+				sb.append(",");
+			} else{
+				first = false;
+			}
+			sb.append(mapper.writeValueAsString(record));
+		}
 		return sb.toString();
 	}
 
