@@ -62,6 +62,7 @@
 				};
 				
 				// form data
+				mydata.selectedIndex = null;
 				mydata.selectedId = null;
 				mydata.selectedBucket = null;
 				mydata.buckets = ['dgallagher-bucket','dgallagher.file-dump','dgallagher.lambda-store','dgallagher.reporting','dgallagher.reporting-service'];
@@ -168,6 +169,7 @@
 					angular.forEach(mydata.data, function(item){ // use foreach demo could use index
 						if(item.id == id){
 							mydata.closeAlert();
+							mydata.selectedIndex = mydata.data.indexOf(item);
 							mydata.selectedId = item.id;
 							mydata.selectedBucket = item.bucket;
 							mydata.selectedRedshift = item.redShift;
@@ -186,6 +188,7 @@
 				// clear bucket
 				mydata.clear = function(bucketName){
 					mydata.closeAlert();
+					mydata.selectedIndex = null;
 					mydata.selectedId = null;
 					mydata.selectedBucket = null;
 					mydata.selectedRedshift = null;
@@ -209,15 +212,15 @@
 					//console.log('Index:'+index);
 					//mydata.data.splice(index,1);
 					// TODO:dg json update call & update if success
-					if(mydata.data[mydata.selectedId].bucket != mydata.selectedBucket){
+					if(mydata.data[mydata.selectedIndex].bucket != mydata.selectedBucket){
 						mydata.setAlert(true, 'ERROR: Cannot change bucket: '+mydata.selectedBucket);
 						return;
 					}
-					mydata.data[mydata.selectedId].Bucket = mydata.selectedBucket;
-					mydata.data[mydata.selectedId].RedShift = mydata.selectedRedshift;
-					mydata.data[mydata.selectedId].Live = (mydata.selectedStatus == 'Yes');
-					mydata.data[mydata.selectedId].Files = mydata.selectedFiles;
-					mydata.data[mydata.selectedId].Batch = mydata.selectedBatch;
+					mydata.data[mydata.selectedIndex].bucket = mydata.selectedBucket;
+					mydata.data[mydata.selectedIndex].redShift = mydata.selectedRedshift;
+					mydata.data[mydata.selectedIndex].live = (mydata.selectedStatus == 'Yes');
+					mydata.data[mydata.selectedIndex].files = mydata.selectedFiles;
+					mydata.data[mydata.selectedIndex].batch = mydata.selectedBatch;
 					mydata.filterProcess();
 					mydata.setAlert(true, 'SUCCESS: Updated record for: '+mydata.selectedBucket);
 				}
@@ -265,7 +268,7 @@
 				}
 				
 				mydata.doDelete = function(){
-					var payload = mydata.buildPayload('DELETE', mydata.data[this.selectedId]);
+					var payload = mydata.buildPayload('DELETE', mydata.data[this.selectedIndex]);
 					console.log(JSON.stringify(payload));
 					$http.post(
 							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/PostDemo',
