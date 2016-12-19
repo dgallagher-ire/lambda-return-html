@@ -239,7 +239,12 @@
 						return;
 					}
 					// TODO:dg JSON add call
-					var newRec = angular.copy(mydata.data[0]);
+					var newRec;
+					if(mydata.data.length == 0){
+						var newRec = {id : 0,Bucket : 'dgallagher-bucket',Live : true,Files : 10000,Batch : 1000,RedShift : 'harvest.surplus'};
+					} else{
+						newRec = angular.copy(mydata.data[0]);
+					}
 					newRec.id = mydata.data.length;
 					newRec.Bucket = mydata.selectedBucket;
 					newRec.RedShift = mydata.selectedRedshift;
