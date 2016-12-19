@@ -71,6 +71,15 @@
 				mydata.status = ['No', 'Yes'];
 				mydata.selectedFiles = null;
 				mydata.selectedBatch = null;
+				// clear form
+				mydata.clearForm = function(){
+					mydata.selectedId = null;
+					mydata.selectedBucket = null;
+					mydata.selectedRedshift = null;
+					mydata.selectedStatus = null;
+					mydata.selectedFiles = null;
+					mydata.selectedBatch = null;
+				}
 				
 				// form alert
 				mydata.showAlert = false;
@@ -248,21 +257,36 @@
 						console.log('validation failed');
 						return;
 					}
-					this.showJson();
 					mydata.setConfDel(true,'Confirm delete?');
 				}
 				
 				mydata.doDelete = function(){
-					var payLoad = mydata.data[this.selectedId];
-					console.log(JSON.stringify(payLoad));
-					//payLoad.push({'action':'DELETE'});
-					//console.log(JSON.stringify(payLoad));
-					var res = $http.post('https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/PostDemo',JSON.stringify(payLoad));
+					var payload = mydata.buildPayload('DELETE', mydata.data[this.selectedId]);
+					console.log(JSON.stringify(payload));
+					$http.post(
+							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/PostDemo',
+							payload)
+							.then(
+								function (response) {
+									var resData = response.data;
+									console.log('ResData:'+resData.response);
+								},
+								function (data, status, header, config) {
+								
+								}
+							);
 				}
 				
-				mydata.showJson = function(){
-					var json = JSON.stringify(mydata.data[mydata.selectedId]);
-					console.log(json);
+				mydata.buildPayload = function(doAction, record){
+					var payLoad = {
+							action : doAction,
+							bucket : record.Bucket,
+							live : (record.Live == 'Yes'),
+							files : record.Files,
+							batch : record.Batch,
+							redShift : record.RedShift
+					};
+					return payLoad;
 				}
 				
 				

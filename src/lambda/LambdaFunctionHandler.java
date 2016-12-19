@@ -27,7 +27,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 	@Override
 	public String handleRequest(Object input, Context context) {
 		context.getLogger().log("Input: " + input);
-		try{
+		try {
 			final AmazonS3 s3Client = new AmazonS3Client();
 			final String loaderJson = getFileContents(s3Client, "dgallagher-bucket", "loader-data.json");
 			final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
@@ -35,16 +35,27 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 			html = html.replace(bucketReplace, getBucketsLists(s3Client));
 			html = html.replace(redShiftReplace, getRedShiftList());
 			return html;
-		} catch(Exception e){
+		} catch (Exception e) {
 			return e.toString();
 		}
 	}
-		
-	private String getRedShiftList() throws Exception {
+
+	public static void main(final String[] args) {
+		try {
+			final AmazonS3 s3Client = new AmazonS3Client();
+			final String loaderJson = getFileContents(s3Client, "dgallagher-bucket", "loader-data.json");
+			final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
+			int w = 0;
+		} catch (Exception e) {
+			int z = 0;
+		}
+	}
+
+	private static String getRedShiftList() throws Exception {
 		return "'harvest.surplus','ds.backup','harvest.logs', 'pu.table'";
 	}
-	
-	private String getBucketsLists(final AmazonS3 s3Client) throws Exception {
+
+	private static String getBucketsLists(final AmazonS3 s3Client) throws Exception {
 		final List<Bucket> buckets = s3Client.listBuckets();
 		Collections.sort(buckets, new Comparator<Bucket>() {
 			@Override
@@ -54,8 +65,8 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		});
 		final StringBuilder sb = new StringBuilder();
 		boolean first = true;
-		for(final Bucket b : buckets){
-			if(!first){
+		for (final Bucket b : buckets) {
+			if (!first) {
 				sb.append(",");
 			}
 			first = false;
@@ -63,33 +74,32 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		}
 		return sb.toString();
 	}
-	
-	private String getFileContents(final AmazonS3 s3Client,
-			final String bucketName,
-			final String fileName) throws Exception {
-		
+
+	private static String getFileContents(final AmazonS3 s3Client, final String bucketName, final String fileName)
+			throws Exception {
+
 		InputStream in = null;
-		try{
+		try {
 			final S3Object s3object = s3Client.getObject(new GetObjectRequest(bucketName, fileName));
 			in = s3object.getObjectContent();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			String line = null;
 			final StringBuilder sb = new StringBuilder();
-	        while (true) {
-	            line = reader.readLine();
-	            if (line == null){
-	            	break;
-	            }
-	            sb.append(line).append("\r\n");
-	        }
+			while (true) {
+				line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				sb.append(line).append("\r\n");
+			}
 			return sb.toString();
-		} catch(Exception e){
+		} catch (Exception e) {
 			throw e;
-		} finally{
-			if(in != null){
-				try{
+		} finally {
+			if (in != null) {
+				try {
 					in.close();
-				} catch(Exception e){
+				} catch (Exception e) {
 				}
 			}
 		}
