@@ -14,18 +14,24 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lambda.file.Records;
 
 public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 
 	private static final String bucketReplace = "'dgallagher-bucket','dgallagher.file-dump','dgallagher.lambda-store','dgallagher.reporting','dgallagher.reporting-service'";
 	private static final String redShiftReplace = "'harvest.surplus','ds.backup','harvest.logs', 'pu.table'";
-	
+	private static final String loaderData = "{id : 0,Bucket : 'dgallagher-bucket',Live : true,Files : 10000,Batch : 1000,RedShift : 'harvest.surplus'}, {id : 1,Bucket : 'dgallagher.file-dump',Live : true,Files : 10000,Batch : 1000,RedShift : 'ds.backup'}, {id : 2,Bucket : 'dgallagher.lambda-store',Live : false,Files : 250000,Batch : 20000,RedShift : 'harvest.logs'}";
+
 	@Override
 	public String handleRequest(Object input, Context context) {
 		context.getLogger().log("Input: " + input);
 		try{
 			final AmazonS3 s3Client = new AmazonS3Client();
-			String html = getFileContents(s3Client);
+			final String loaderJson = getFileContents(s3Client, "dgallagher-bucket", "loader-data.json");
+			final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
+			String html = getFileContents(s3Client, "dgallagher-bucket", "HTMLTEMPLATE.html");
 			html = html.replace(bucketReplace, getBucketsLists(s3Client));
 			html = html.replace(redShiftReplace, getRedShiftList());
 			return html;
@@ -58,10 +64,13 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		return sb.toString();
 	}
 	
-	private String getFileContents(final AmazonS3 s3Client) throws Exception {
+	private String getFileContents(final AmazonS3 s3Client,
+			final String bucketName,
+			final String fileName) throws Exception {
+		
 		InputStream in = null;
 		try{
-			final S3Object s3object = s3Client.getObject(new GetObjectRequest("dgallagher-bucket", "HTMLTEMPLATE.html"));
+			final S3Object s3object = s3Client.getObject(new GetObjectRequest(bucketName, fileName));
 			in = s3object.getObjectContent();
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			String line = null;
