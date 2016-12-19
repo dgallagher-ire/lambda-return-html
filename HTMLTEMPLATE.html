@@ -73,6 +73,18 @@
 				mydata.selectedFiles = null;
 				mydata.selectedBatch = null;
 				
+				// clear select bucket
+				mydata.clear = function(bucketName){
+					mydata.closeAlert();
+					mydata.selectedIndex = null;
+					mydata.selectedId = null;
+					mydata.selectedBucket = null;
+					mydata.selectedRedshift = null;
+					mydata.selectedStatus = null;
+					mydata.selectedFiles = null;
+					mydata.selectedBatch = null;
+				}
+				
 				// form alert
 				mydata.showAlert = false;
 				mydata.alertMessage = null;
@@ -185,18 +197,6 @@
 					});
 				}
 				
-				// clear bucket
-				mydata.clear = function(bucketName){
-					mydata.closeAlert();
-					mydata.selectedIndex = null;
-					mydata.selectedId = null;
-					mydata.selectedBucket = null;
-					mydata.selectedRedshift = null;
-					mydata.selectedStatus = null;
-					mydata.selectedFiles = null;
-					mydata.selectedBatch = null;
-				}
-				
 				// update record
 				mydata.update = function(){
 					console.log('in update');
@@ -249,9 +249,27 @@
 					newRec.live = (mydata.selectedStatus == 'Yes');
 					newRec.files = mydata.selectedFiles;
 					newRec.batch = mydata.selectedBatch;
-					mydata.data.push(newRec);
-					mydata.filterProcess();
-					mydata.setAlert(true, 'SUCCESS: Added new record for: '+mydata.selectedBucket);
+					// json call
+					var payload = mydata.buildPayload('ADD', newRec);
+					console.log(JSON.stringify(payload));
+					$http.post(
+							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/PostDemo',
+							payload)
+							.then(
+								function (response) {
+									var resData = response.data;
+									console.log('ResData:'+resData.response);
+									if(resData.response == 'success'){
+										mydata.clear();
+										mydata.data.push(newRec);
+										mydata.filterProcess();
+										mydata.setAlert(true, 'SUCCESS: Added new record for: '+newRec.bucket);
+									}
+								},
+								function (data, status, header, config) {
+									mydata.setAlert(true, 'ERROR: Problem adding new record');
+								}
+							);
 				}
 				
 				mydata.delete = function(){
