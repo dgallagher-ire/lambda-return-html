@@ -71,15 +71,6 @@
 				mydata.status = ['No', 'Yes'];
 				mydata.selectedFiles = null;
 				mydata.selectedBatch = null;
-				// clear form
-				mydata.clearForm = function(){
-					mydata.selectedId = null;
-					mydata.selectedBucket = null;
-					mydata.selectedRedshift = null;
-					mydata.selectedStatus = null;
-					mydata.selectedFiles = null;
-					mydata.selectedBatch = null;
-				}
 				
 				// form alert
 				mydata.showAlert = false;
@@ -261,7 +252,11 @@
 				}
 				
 				mydata.delete = function(){
-					console.log('in update');
+					console.log('in delete');
+					if(mydata.selectedId == null){
+						mydata.setAlert(true, 'ERROR: Please select a record to delete');
+						return;
+					}
 					if(!this.validateForm()){
 						console.log('validation failed');
 						return;
