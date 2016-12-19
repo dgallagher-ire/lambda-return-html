@@ -29,11 +29,10 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		context.getLogger().log("Input: " + input);
 		try {
 			final AmazonS3 s3Client = new AmazonS3Client();
-			final String loaderJson = getFileContents(s3Client, "dgallagher-bucket", "loader-data.json");
-			final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
 			String html = getFileContents(s3Client, "dgallagher-bucket", "HTMLTEMPLATE.html");
 			html = html.replace(bucketReplace, getBucketsLists(s3Client));
 			html = html.replace(redShiftReplace, getRedShiftList());
+			html = html.replace(loaderData, getRecords(s3Client));
 			return html;
 		} catch (Exception e) {
 			return e.toString();
@@ -49,6 +48,16 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		} catch (Exception e) {
 			int z = 0;
 		}
+	}
+	
+	public static String getRecords(final AmazonS3 s3Client) throws Exception {
+		final StringBuilder sb = new StringBuilder();
+		final String loaderJson = getFileContents(s3Client, "dgallagher-bucket", "loader-data.json");
+		if(loaderJson == null || loaderJson.equals("")){
+			return sb.toString();
+		}
+		final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
+		return sb.toString();
 	}
 
 	private static String getRedShiftList() throws Exception {

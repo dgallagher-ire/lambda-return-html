@@ -206,6 +206,10 @@
 				// update record
 				mydata.update = function(){
 					console.log('in update');
+					if(mydata.selectedId == null){
+						mydata.setAlert(true, 'ERROR: Please select a record to update');
+						return;
+					}
 					if(!this.validateForm()){
 						console.log('validation failed');
 						return;
