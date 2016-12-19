@@ -1,0 +1,5 @@
+{
+"records" : [
+{"bucket" : "delcan test", "live" : true, "files" : 123456, "batch" : 123, "redShift" : "ds.table"}
+]
+}

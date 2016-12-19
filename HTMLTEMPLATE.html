@@ -128,7 +128,7 @@
 				mydata.validateNew = function(){
 					var result = true;
 					angular.forEach(mydata.data, function(item){
-						if(item.Bucket == mydata.selectedBucket){
+						if(item.bucket == mydata.selectedBucket){
 							mydata.setAlert(true, 'ERROR: Loader already exists for bucket: '+mydata.selectedBucket);
 							result = false;
 						}
@@ -137,7 +137,7 @@
 						return false;
 					}
 					angular.forEach(mydata.data, function(item){
-						if(item.RedShift == mydata.selectedRedshift){
+						if(item.redShift == mydata.selectedRedshift){
 							mydata.setAlert(true, 'ERROR: Loader already exists for RedShift: '+mydata.selectedRedshift);
 							result = false;
 						}
@@ -150,16 +150,16 @@
 
 				// table header
 				mydata.header = [
-					{name: 'Bucket', setting : ''},
-					{name: 'Live', setting : ''},
-					{name: 'Files', setting : ''},
-					{name: 'Batch', setting : 'hidden-xs'},
-					{name: 'RedShift', setting : 'hidden-xs'},
+					{name: 'bucket', setting : ''},
+					{name: 'live', setting : ''},
+					{name: 'files', setting : ''},
+					{name: 'batch', setting : 'hidden-xs'},
+					{name: 'redShift', setting : 'hidden-xs'},
 					{name: '', setting : ''}
 					];
 
 				// table data
-				mydata.data = [{id : 0,Bucket : 'dgallagher-bucket',Live : true,Files : 10000,Batch : 1000,RedShift : 'harvest.surplus'}, {id : 1,Bucket : 'dgallagher.file-dump',Live : true,Files : 10000,Batch : 1000,RedShift : 'ds.backup'}, {id : 2,Bucket : 'dgallagher.lambda-store',Live : false,Files : 250000,Batch : 20000,RedShift : 'harvest.logs'}];
+				mydata.data = [{id : 0,bucket : 'dgallagher-bucket',live : true,files : 10000,batch : 1000,redShift : 'harvest.surplus'}, {id : 1,bucket : 'dgallagher.file-dump',live : true,files : 10000,batch : 1000,redShift : 'ds.backup'}, {id : 2,bucket : 'dgallagher.lambda-store',live : false,files : 250000,batch : 20000,redShift : 'harvest.logs'}];
 				
 				mydata.filteredData = mydata.data;
 				
@@ -169,15 +169,15 @@
 						if(item.id == id){
 							mydata.closeAlert();
 							mydata.selectedId = item.id;
-							mydata.selectedBucket = item.Bucket;
-							mydata.selectedRedshift = item.RedShift;
-							if(item.Live){
+							mydata.selectedBucket = item.bucket;
+							mydata.selectedRedshift = item.redShift;
+							if(item.live){
 								mydata.selectedStatus = 'Yes';
 							} else{
 								mydata.selectedStatus = 'No';
 							}
-							mydata.selectedFiles = item.Files;
-							mydata.selectedBatch = item.Batch;
+							mydata.selectedFiles = item.files;
+							mydata.selectedBatch = item.batch;
 						}
 						
 					});
@@ -209,7 +209,7 @@
 					//console.log('Index:'+index);
 					//mydata.data.splice(index,1);
 					// TODO:dg json update call & update if success
-					if(mydata.data[mydata.selectedId].Bucket != mydata.selectedBucket){
+					if(mydata.data[mydata.selectedId].bucket != mydata.selectedBucket){
 						mydata.setAlert(true, 'ERROR: Cannot change bucket: '+mydata.selectedBucket);
 						return;
 					}
@@ -236,16 +236,16 @@
 					// TODO:dg JSON add call
 					var newRec;
 					if(mydata.data.length == 0){
-						var newRec = {id : 0,Bucket : 'dgallagher-bucket',Live : true,Files : 10000,Batch : 1000,RedShift : 'harvest.surplus'};
+						var newRec = {id : 0,bucket : 'dgallagher-bucket',live : true,files : 10000,batch : 1000,redShift : 'harvest.surplus'};
 					} else{
 						newRec = angular.copy(mydata.data[0]);
 					}
 					newRec.id = mydata.data.length;
-					newRec.Bucket = mydata.selectedBucket;
-					newRec.RedShift = mydata.selectedRedshift;
-					newRec.Live = (mydata.selectedStatus == 'Yes');
-					newRec.Files = mydata.selectedFiles;
-					newRec.Batch = mydata.selectedBatch;
+					newRec.bucket = mydata.selectedBucket;
+					newRec.redShift = mydata.selectedRedshift;
+					newRec.live = (mydata.selectedStatus == 'Yes');
+					newRec.files = mydata.selectedFiles;
+					newRec.batch = mydata.selectedBatch;
 					mydata.data.push(newRec);
 					mydata.filterProcess();
 					mydata.setAlert(true, 'SUCCESS: Added new record for: '+mydata.selectedBucket);
@@ -284,11 +284,11 @@
 				mydata.buildPayload = function(doAction, record){
 					var payLoad = {
 							action : doAction,
-							bucket : record.Bucket,
-							live : (record.Live == 'Yes'),
-							files : record.Files,
-							batch : record.Batch,
-							redShift : record.RedShift
+							bucket : record.bucket,
+							live : (record.live == 'Yes'),
+							files : record.files,
+							batch : record.batch,
+							redShift : record.redShift
 					};
 					return payLoad;
 				}
@@ -345,16 +345,15 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="row in mydata.filteredData | orderBy:mydata.sortKey:mydata.sortInvert">
-								<td>{{row.Bucket}}</td>
-								<td ng-if="row.Live == true"><span
+								<td>{{row.bucket}}</td>
+								<td ng-if="row.live == true"><span
 									class="label label-success">Yes</span></td>
-								<td ng-if="row.Live == false"><span
+								<td ng-if="row.live == false"><span
 									class="label label-danger">No</span></td>
-								<td>{{row.Files}}</td>
-								<td class="hidden-xs">{{row.Batch}}</td>
-								<td class="hidden-xs">{{row.RedShift}}</td>
-								<td><a href="#myForm"><button type="button"
-											ng-click="mydata.edit(row.id)" class="btn btn-info btn-xs">Edit</button></a>
+								<td>{{row.files}}</td>
+								<td class="hidden-xs">{{row.batch}}</td>
+								<td class="hidden-xs">{{row.redShift}}</td>
+								<td><a href="#myForm"><button type="button" ng-click="mydata.edit(row.id)" class="btn btn-info btn-xs">Edit</button></a>
 								</td>
 								<!-- <td><a href="" target="_blank"><button type="button" class="btn btn-warning btn-xs">Log</button></a></td> -->
 							</tr>

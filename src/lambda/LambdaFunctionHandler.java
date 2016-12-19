@@ -23,7 +23,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 
 	private static final String bucketReplace = "'dgallagher-bucket','dgallagher.file-dump','dgallagher.lambda-store','dgallagher.reporting','dgallagher.reporting-service'";
 	private static final String redShiftReplace = "'harvest.surplus','ds.backup','harvest.logs', 'pu.table'";
-	private static final String loaderData = "{id : 0,Bucket : 'dgallagher-bucket',Live : true,Files : 10000,Batch : 1000,RedShift : 'harvest.surplus'}, {id : 1,Bucket : 'dgallagher.file-dump',Live : true,Files : 10000,Batch : 1000,RedShift : 'ds.backup'}, {id : 2,Bucket : 'dgallagher.lambda-store',Live : false,Files : 250000,Batch : 20000,RedShift : 'harvest.logs'}";
+	private static final String loaderData = "{id : 0,bucket : 'dgallagher-bucket',live : true,files : 10000,batch : 1000,redShift : 'harvest.surplus'}, {id : 1,bucket : 'dgallagher.file-dump',live : true,files : 10000,batch : 1000,redShift : 'ds.backup'}, {id : 2,bucket : 'dgallagher.lambda-store',live : false,files : 250000,batch : 20000,redShift : 'harvest.logs'}";
 
 	@Override
 	public String handleRequest(Object input, Context context) {
@@ -60,7 +60,10 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		final ObjectMapper mapper = new ObjectMapper();
 		final Records records = mapper.readValue(loaderJson, Records.class);
 		boolean first = true;
-		for(final Record record : records.getData()){
+		int id = 0;
+		for(final Record record : records.getRecords()){
+			id++;
+			record.setId(id);
 			if(!first){
 				sb.append(",");
 			} else{
