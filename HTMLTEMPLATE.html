@@ -316,15 +316,22 @@
 					var payload = mydata.buildPayload('DELETE', mydata.data[this.selectedIndex]);
 					console.log(JSON.stringify(payload));
 					$http.post(
-							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/PostDemo',
+							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/file-admin',
 							payload)
 							.then(
 								function (response) {
 									var resData = response.data;
 									console.log('ResData:'+resData.response);
+									if(angular.equals(resData.response,'success')){
+										mydata.data.splice(this.selectedIndex,1);
+										mydata.closeConfDel();
+										mydata.setAlert(true, 'SUCCESS: Record delete: '+mydata.selectedBucket);
+										mydata.clear();
+									}
 								},
 								function (data, status, header, config) {
-								
+									mydata.closeConfDel();
+									mydata.setAlert(true, 'ERROR: Record was NOT deleted: '+mydata.selectedBucket);
 								}
 							);
 				}
