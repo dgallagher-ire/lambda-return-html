@@ -211,18 +211,44 @@
 					//var index = mydata.data.indexOf(item);
 					//console.log('Index:'+index);
 					//mydata.data.splice(index,1);
-					// TODO:dg json update call & update if success
 					if(mydata.data[mydata.selectedIndex].bucket != mydata.selectedBucket){
 						mydata.setAlert(true, 'ERROR: Cannot change bucket: '+mydata.selectedBucket);
 						return;
 					}
-					mydata.data[mydata.selectedIndex].bucket = mydata.selectedBucket;
-					mydata.data[mydata.selectedIndex].redShift = mydata.selectedRedshift;
-					mydata.data[mydata.selectedIndex].live = (mydata.selectedStatus == 'Yes');
-					mydata.data[mydata.selectedIndex].files = mydata.selectedFiles;
-					mydata.data[mydata.selectedIndex].batch = mydata.selectedBatch;
-					mydata.filterProcess();
-					mydata.setAlert(true, 'SUCCESS: Updated record for: '+mydata.selectedBucket);
+					// build record for sending TODO:dg make function
+					var newRec = {id : 0,bucket : 'dgallagher-bucket',live : true,files : 10000,batch : 1000,redShift : 'harvest.surplus'};
+					newRec.bucket = mydata.selectedBucket;
+					newRec.redShift = mydata.selectedRedshift;
+					console.log("SelectedStatus:"+mydata.selectedStatus);
+					console.log("Test:"+angular.equals('Yes', mydata.selectedStatus));
+					newRec.live = angular.equals('Yes', mydata.selectedStatus);
+					newRec.files = mydata.selectedFiles;
+					newRec.batch = mydata.selectedBatch;
+					// json call
+					var payload = mydata.buildPayload('UPDATE', newRec);
+					console.log(JSON.stringify(payload));
+					$http.post(
+							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/file-admin',
+							payload)
+							.then(
+								function (response) {
+									var resData = response.data;
+									console.log('ResData:'+resData.response);
+									if(angular.equals(resData.response, 'success')){
+										mydata.data[mydata.selectedIndex].bucket = mydata.selectedBucket;
+										mydata.data[mydata.selectedIndex].redShift = mydata.selectedRedshift;
+										mydata.data[mydata.selectedIndex].live = angular.equals('Yes', mydata.selectedStatus);
+										mydata.data[mydata.selectedIndex].files = mydata.selectedFiles;
+										mydata.data[mydata.selectedIndex].batch = mydata.selectedBatch;
+										mydata.filterProcess();
+										mydata.setAlert(true, 'SUCCESS: Updated record for: '+mydata.selectedBucket);
+										mydata.setAlert(true, 'SUCCESS: Added new record for: '+newRec.bucket);
+									}
+								},
+								function (data, status, header, config) {
+									mydata.setAlert(true, 'ERROR: Problem adding new record');
+								}
+							);
 				}
 				
 				// add new record
@@ -246,7 +272,8 @@
 					newRec.id = mydata.data.length;
 					newRec.bucket = mydata.selectedBucket;
 					newRec.redShift = mydata.selectedRedshift;
-					newRec.live = (mydata.selectedStatus == 'Yes');
+					console.log("SelectedStatus:"+mydata.selectedStatus);
+					newRec.live = angular.equals('Yes', mydata.selectedStatus);
 					newRec.files = mydata.selectedFiles;
 					newRec.batch = mydata.selectedBatch;
 					// json call
@@ -259,7 +286,7 @@
 								function (response) {
 									var resData = response.data;
 									console.log('ResData:'+resData.response);
-									if(resData.response == 'success'){
+									if(angular.equals(resData.response,'success')){
 										mydata.clear();
 										mydata.data.push(newRec);
 										mydata.filterProcess();
@@ -272,6 +299,7 @@
 							);
 				}
 				
+				// delete record
 				mydata.delete = function(){
 					console.log('in delete');
 					if(mydata.selectedId == null){
@@ -306,7 +334,7 @@
 					var payLoad = {
 							action : doAction,
 							bucket : record.bucket,
-							live : (record.live == 'Yes'),
+							live : record.live,
 							files : record.files,
 							batch : record.batch,
 							redShift : record.redShift
