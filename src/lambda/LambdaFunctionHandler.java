@@ -43,6 +43,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 	public static void main(final String[] args) {
 		try {
 			final AmazonS3 s3Client = new AmazonS3Client();
+			getRecords(s3Client) ;
 			final String loaderJson = getFileContents(s3Client, "dgallagher-bucket", "loader-data.json");
 			final Records records = new ObjectMapper().readValue(loaderJson, Records.class);
 			int w = 0;
@@ -62,7 +63,6 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		boolean first = true;
 		int id = 0;
 		for(final Record record : records.getRecords()){
-			id++;
 			record.setId(id);
 			if(!first){
 				sb.append(",");
@@ -70,6 +70,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 				first = false;
 			}
 			sb.append(mapper.writeValueAsString(record));
+			id++;
 		}
 		return sb.toString();
 	}

@@ -253,7 +253,7 @@
 					var payload = mydata.buildPayload('ADD', newRec);
 					console.log(JSON.stringify(payload));
 					$http.post(
-							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/PostDemo',
+							'https://8p61mpr4yl.execute-api.eu-west-1.amazonaws.com/prod/file-admin',
 							payload)
 							.then(
 								function (response) {
