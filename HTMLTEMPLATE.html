@@ -86,6 +86,7 @@
 				}
 				
 				// form alert
+				mydata.alertType = 'danger';
 				mydata.showAlert = false;
 				mydata.alertMessage = null;
 				// close alert
@@ -93,7 +94,8 @@
 					mydata.setAlert(false, null);
 					mydata.closeConfDel();
 				}
-				mydata.setAlert = function(alert, msg){
+				mydata.setAlert = function(alert, msg, type){
+					mydata.alertType = type;
 					mydata.showAlert = alert;
 					mydata.alertMessage = msg;
 				}
@@ -115,23 +117,23 @@
 				mydata.validateForm = function(){
 					console.log('in validation');
 					if(mydata.selectedBucket == null){
-						mydata.setAlert(true, 'ERROR: Please select a bucket');
+						mydata.setAlert(true, 'ERROR: Please select a bucket', 'danger');
 						return false;
 					}
 					if(mydata.selectedStatus == null){
-						mydata.setAlert(true, 'ERROR: Please select if live');
+						mydata.setAlert(true, 'ERROR: Please select if live', 'danger');
 						return false;
 					}
 					if(mydata.selectedFiles == null){
-						mydata.setAlert(true, 'ERROR: Please select a number of file');
+						mydata.setAlert(true, 'ERROR: Please select a number of file', 'danger');
 						return false;
 					}
 					if(mydata.selectedBatch == null){
-						mydata.setAlert(true, 'ERROR: Please select a batch size');
+						mydata.setAlert(true, 'ERROR: Please select a batch size', 'danger');
 						return false;
 					}
 					if(mydata.selectedRedshift == null){
-						mydata.setAlert(true, 'ERROR: Please select a RedShift table');
+						mydata.setAlert(true, 'ERROR: Please select a RedShift table', 'danger');
 						return false;
 					}
 					return true;
@@ -142,7 +144,7 @@
 					var result = true;
 					angular.forEach(mydata.data, function(item){
 						if(item.bucket == mydata.selectedBucket){
-							mydata.setAlert(true, 'ERROR: Loader already exists for bucket: '+mydata.selectedBucket);
+							mydata.setAlert(true, 'ERROR: Loader already exists for bucket: '+mydata.selectedBucket, 'danger');
 							result = false;
 						}
 					});
@@ -151,7 +153,7 @@
 					}
 					angular.forEach(mydata.data, function(item){
 						if(item.redShift == mydata.selectedRedshift){
-							mydata.setAlert(true, 'ERROR: Loader already exists for RedShift: '+mydata.selectedRedshift);
+							mydata.setAlert(true, 'ERROR: Loader already exists for RedShift: '+mydata.selectedRedshift, 'danger');
 							result = false;
 						}
 					});
@@ -201,7 +203,7 @@
 				mydata.update = function(){
 					console.log('in update');
 					if(mydata.selectedId == null){
-						mydata.setAlert(true, 'ERROR: Please select a record to update');
+						mydata.setAlert(true, 'ERROR: Please select a record to update', 'danger');
 						return;
 					}
 					if(!this.validateForm()){
@@ -212,7 +214,7 @@
 					//console.log('Index:'+index);
 					//mydata.data.splice(index,1);
 					if(mydata.data[mydata.selectedIndex].bucket != mydata.selectedBucket){
-						mydata.setAlert(true, 'ERROR: Cannot change bucket: '+mydata.selectedBucket);
+						mydata.setAlert(true, 'ERROR: Cannot change bucket: '+mydata.selectedBucket, 'danger');
 						return;
 					}
 					// build record for sending TODO:dg make function
@@ -241,11 +243,11 @@
 										mydata.data[mydata.selectedIndex].files = mydata.selectedFiles;
 										mydata.data[mydata.selectedIndex].batch = mydata.selectedBatch;
 										mydata.filterProcess();
-										mydata.setAlert(true, 'SUCCESS: Updated record for: '+newRec.bucket);
+										mydata.setAlert(true, 'SUCCESS: Updated record for: '+newRec.bucket, 'success');
 									}
 								},
 								function (data, status, header, config) {
-									mydata.setAlert(true, 'ERROR: Problem adding new record');
+									mydata.setAlert(true, 'ERROR: Problem adding new record', 'danger');
 								}
 							);
 				}
@@ -289,11 +291,11 @@
 										mydata.clear();
 										mydata.data.push(newRec);
 										mydata.filterProcess();
-										mydata.setAlert(true, 'SUCCESS: Added new record for: '+newRec.bucket);
+										mydata.setAlert(true, 'SUCCESS: Added new record for: '+newRec.bucket, 'success');
 									}
 								},
 								function (data, status, header, config) {
-									mydata.setAlert(true, 'ERROR: Problem adding new record');
+									mydata.setAlert(true, 'ERROR: Problem adding new record', 'danger');
 								}
 							);
 				}
@@ -302,7 +304,7 @@
 				mydata.delete = function(){
 					console.log('in delete');
 					if(mydata.selectedId == null){
-						mydata.setAlert(true, 'ERROR: Please select a record to delete');
+						mydata.setAlert(true, 'ERROR: Please select a record to delete', 'danger');
 						return;
 					}
 					if(!this.validateForm()){
@@ -328,12 +330,12 @@
 										mydata.closeConfDel();
 										var buk = mydata.selectedBucket;
 										mydata.clear();
-										mydata.setAlert(true, 'SUCCESS: Record delete: '+buk);
+										mydata.setAlert(true, 'SUCCESS: Record deleted: '+buk);
 									}
 								},
 								function (data, status, header, config) {
 									mydata.closeConfDel();
-									mydata.setAlert(true, 'ERROR: Record was NOT deleted: '+mydata.selectedBucket);
+									mydata.setAlert(true, 'ERROR: Record was NOT deleted: '+mydata.selectedBucket, 'danger');
 								}
 							);
 				}
@@ -420,7 +422,7 @@
 			</div>
 			<div class="col-md-6">
 				<form id="myForm">
-					<div class="alert alert-warning" ng-show="mydata.showAlert">
+					<div class="alert alert-{{mydata.alertType}}" ng-show="mydata.showAlert">
 						<button type="button" class="close glyphicon glyphicon-remove"
 							data-ng-click="mydata.closeAlert()"></button>
 						<strong>{{mydata.alertMessage}}</strong>
