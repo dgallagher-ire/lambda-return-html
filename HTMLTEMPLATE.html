@@ -323,10 +323,12 @@
 									var resData = response.data;
 									console.log('ResData:'+resData.response);
 									if(angular.equals(resData.response,'success')){
+										console.log('in the success del');
 										mydata.data.splice(this.selectedIndex,1);
 										mydata.closeConfDel();
-										mydata.setAlert(true, 'SUCCESS: Record delete: '+mydata.selectedBucket);
+										var buk = mydata.selectedBucket;
 										mydata.clear();
+										mydata.setAlert(true, 'SUCCESS: Record delete: '+buk);
 									}
 								},
 								function (data, status, header, config) {
