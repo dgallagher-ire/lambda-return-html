@@ -349,9 +349,9 @@
 							);
 				}
 				
-				/*mydata.loadExt = function() {
+				mydata.loadExt = function() {
 					console.log(JSON.stringify(mydata.data));
-					var link = 'http://localhost:8084/api-backend/datademo';
+					var link = 'http://localhost:8084/api-backend/api?call=datademo';
 					$http.post(
 							link,
 							'any old crap for the moment')
@@ -368,7 +368,7 @@
 								}
 							);
 					
-				}*/
+				}
 				
 				mydata.buildPayload = function(doAction, record){
 					var payLoad = {
@@ -515,7 +515,7 @@
 		<div style="height: 30px;"></div>
 		<div style="width: 100%; text-align: center; vertical-align: bottom;">
 			<a href="#top">
-				<button type="button" class="btn btn-info btn-sm">
+				<button type="button" class="btn btn-info btn-sm" ng-click="mydata.loadExt()">
 					<span class="glyphicon glyphicon-menu-up" aria-hidden="true"></span>
 				</button>
 			</a>
