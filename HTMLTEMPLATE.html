@@ -178,6 +178,15 @@
 				
 				mydata.filteredData = mydata.data;
 				
+				//get keys from object
+				//mydata.test = function() {
+				//	var keys = '';
+				//	for(var keyName in mydata.header[0]){
+				//		keys += ','+keyName
+				//	}
+				//	$window.alert(keys);
+				//}
+				
 				// display selected table row, based on id
 				mydata.edit = function(id){
 					angular.forEach(mydata.data, function(item){ // use foreach demo could use index
@@ -339,6 +348,27 @@
 								}
 							);
 				}
+				
+				/*mydata.loadExt = function() {
+					console.log(JSON.stringify(mydata.data));
+					var link = 'http://localhost:8084/api-backend/datademo';
+					$http.post(
+							link,
+							'any old crap for the moment')
+							.then(
+								function (response) {
+									var resData = response.data;
+									console.log('Res:'+response);
+									console.log('ResData:'+console.log(JSON.stringify(resData)));
+									console.log('Status:'+response.statusText); 
+									mydata.data = resData.list;
+								},
+								function (data, status, header, config) {
+									$window.alert('Failed');
+								}
+							);
+					
+				}*/
 				
 				mydata.buildPayload = function(doAction, record){
 					var payLoad = {
